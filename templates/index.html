@@ -2,10 +2,64 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Мій Бекенд</title>
+    <title>Навчальний помічник</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 100px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 40px;
+            margin: 20px;
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        #question, #answer {
+            margin-top: 40px;
+            font-size: 28px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Ласкаво просимо!</h1>
-    <p>Це головна сторінка вашого бекенду.</p>
+
+    <h1>Навчальний помічник</h1>
+
+    <button id="show-question-btn" class="btn">Показати питання</button>
+    <div id="question"></div>
+
+    <button id="show-answer-btn" class="btn" style="display: none;">Показати відповідь</button>
+    <div id="answer"></div>
+
+    <script>
+        let currentAnswer = '';
+
+        document.getElementById("show-question-btn").addEventListener("click", async function() {
+            try {
+                const response = await fetch("/api/random/");
+                const data = await response.json();
+                document.getElementById("question").innerText = data.question;
+                currentAnswer = data.answer;
+
+                document.getElementById("answer").innerText = "";
+                document.getElementById("show-answer-btn").style.display = "inline-block";
+            } catch (error) {
+                console.error("Помилка при отриманні питання:", error);
+            }
+        });
+
+        document.getElementById("show-answer-btn").addEventListener("click", function() {
+            document.getElementById("answer").innerText = currentAnswer;
+        });
+    </script>
+
 </body>
 </html>
