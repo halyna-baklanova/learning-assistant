@@ -1,8 +1,8 @@
-# learn/views.py
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import random
+from django.shortcuts import render
 
 from learn.models import Task
 from learn.serializers import TaskSerializer
@@ -24,3 +24,7 @@ class RandomQuestionView(APIView):
         random_question = random.choice(questions)
         serializer = TaskSerializer(random_question)
         return Response(serializer.data)
+
+
+def random_question_page(request):
+    return render(request, "index.html")
