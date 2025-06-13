@@ -18,7 +18,7 @@ class RandomQuestionView(APIView):
         questions = Task.objects.all()
         if not questions.exists():
             return Response(
-                {"detail": "Питань немає в базі."}, status=status.HTTP_404_NOT_FOUND
+                {"detail": "There are no questions yet. Would you like to add more questions before continuing?"}, status=status.HTTP_404_NOT_FOUND
             )
 
         random_question = random.choice(questions)
