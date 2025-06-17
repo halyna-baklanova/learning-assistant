@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Questions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Paste your questions below</h1>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="data" placeholder="Q: ...\nA: ..."></textarea>
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+</body>
+</html>
