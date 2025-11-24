@@ -8,14 +8,13 @@ from learn.views import (
 )
 
 router = DefaultRouter()
-router.register(r"learn", TaskViewSet)
+router.register(r"task", TaskViewSet, basename="task")
 
 urlpatterns = [
     path("", include(router.urls)),
     path("random/", RandomQuestionView.as_view(), name="random-question"),
     path("upload/", upload_questions_view, name="upload-questions"),
     path("random/question/", random_question_page, name="random-question-html-page"),
-    path("upload/", upload_questions_view, name="upload-questions"),
 ]
 
 app_name = "learn"

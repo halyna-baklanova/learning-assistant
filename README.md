@@ -28,6 +28,7 @@
 1. Clone the repository:
 
    ```bash
+   
    git clone https://github.com/yourusername/learn-assistant.git
    cd learn-assistant
    ```
@@ -35,7 +36,10 @@
 2. Install dependencies:
 
    ```bash
-   pip install -r requirements.txt
+    python -m venv .venv
+    .venv\Scripts\activate (on Windows)
+    source .venv/bin/activate (on macOS)
+    pip install -r requirements.txt
    ```
 
 3. Apply migrations and start the server:
@@ -46,14 +50,14 @@
    ```
 
 4. Open in your browser:
-   `http://localhost:8000/random/question/` — to access the random question page.
+   `http://localhost:8000/learn/question/` — to access the random question page.
 
 ---
 
 ## API Endpoints
 
-* `GET /api/random/` — get a random question in JSON format.
-* `GET/POST/PUT/DELETE /api/learn/` — full CRUD operations for questions.
+* `GET /learn/random/` — get a random question in JSON format.
+* `GET/POST/PUT/DELETE /learn/` — full CRUD operations for questions.
 
 ---
 

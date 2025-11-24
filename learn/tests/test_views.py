@@ -10,7 +10,7 @@ def test_random_question_returns_200_if_task_exists():
     client = APIClient()
 
     # Act
-    response = client.get("/api/random/")
+    response = client.get("/learn/random/")
 
     # Assert
     assert response.status_code == 200
@@ -22,7 +22,7 @@ def test_random_question_returns_200_if_task_exists():
 def test_random_question_returns_404_if_no_tasks():
     client = APIClient()
 
-    response = client.get("/api/random/")
+    response = client.get("/learn/random/")
 
     assert response.status_code == 404
     assert response.data["detail"] == "There are no questions yet. Would you like to add more questions before continuing?"

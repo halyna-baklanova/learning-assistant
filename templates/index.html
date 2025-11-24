@@ -43,18 +43,19 @@
         let currentAnswer = '';
 
         document.getElementById("show-question-btn").addEventListener("click", async function() {
-            try {
-                const response = await fetch("/api/random/");
-                const data = await response.json();
-                document.getElementById("question").innerText = data.question;
-                currentAnswer = data.answer;
+    try {
+        const response = await fetch("/learn/random/"); // DRF view
+        const data = await response.json();
+        document.getElementById("question").innerText = data.question;
+        currentAnswer = data.answer;
 
-                document.getElementById("answer").innerText = "";
-                document.getElementById("show-answer-btn").style.display = "inline-block";
-            } catch (error) {
-                console.error("Помилка при отриманні питання:", error);
-            }
-        });
+        document.getElementById("answer").innerText = "";
+        document.getElementById("show-answer-btn").style.display = "inline-block";
+    } catch (error) {
+        console.error("Помилка при отриманні питання:", error);
+        document.getElementById("question").innerText = "Не вдалося отримати питання.";
+    }
+});
 
         document.getElementById("show-answer-btn").addEventListener("click", function() {
             document.getElementById("answer").innerText = currentAnswer;
