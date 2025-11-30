@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from learn.models import Task
+from .models import Task, Question
 
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["id", "text", "answer"]
 
 class TaskSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)  # nested questions
+
     class Meta:
         model = Task
-        fields = ["id", "question", "answer"]
+        fields = ["id", "title", "description", "questions"]

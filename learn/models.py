@@ -2,5 +2,17 @@ from django.db import models
 
 
 class Task(models.Model):
-    question = models.TextField(blank=False)
-    answer = models.TextField(blank=False)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Question(models.Model):
+    task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
+    text = models.TextField()
+    answer = models.TextField()
+
+    def __str__(self):
+        return self.text
