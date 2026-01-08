@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from learn.models import Task
 
+
 @pytest.mark.django_db
 def test_random_question_returns_200_if_task_exists():
     # Arrange
@@ -25,4 +26,7 @@ def test_random_question_returns_404_if_no_tasks():
     response = client.get("/learn/random/")
 
     assert response.status_code == 404
-    assert response.data["detail"] == "There are no questions yet. Would you like to add more questions before continuing?"
+    assert (
+        response.data["detail"]
+        == "There are no questions yet. Would you like to add more questions before continuing?"
+    )

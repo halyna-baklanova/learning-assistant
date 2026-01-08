@@ -1,14 +1,24 @@
 from rest_framework import serializers
 from .models import Task, Question
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ["id", "text", "answer"]
+        fields = ["id", "text_question", "answer"]
 
-class TaskSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)  # nested questions
+
+class TaskDetailSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="learn:task-detail")
 
     class Meta:
         model = Task
-        fields = ["id", "title", "description", "questions"]
+        fields = ["url", "title", "description", "questions"]
+
+
+class TaskListSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="learn:task-detail")
+
+    class Meta:
+        model = Task
+        fields = ["url", "title"]

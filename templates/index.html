@@ -41,25 +41,31 @@
 
     <script>
         let currentAnswer = '';
+        const taskId = 2; // обраний пакет
 
         document.getElementById("show-question-btn").addEventListener("click", async function() {
-    try {
-        const response = await fetch("/learn/random/"); // DRF view
-        const data = await response.json();
-        document.getElementById("question").innerText = data.question;
-        currentAnswer = data.answer;
+            try {
+                const response = await fetch(`/learn/random/${taskId}/`);
+                const data = await response.json();
 
-        document.getElementById("answer").innerText = "";
-        document.getElementById("show-answer-btn").style.display = "inline-block";
-    } catch (error) {
-        console.error("Помилка при отриманні питання:", error);
-        document.getElementById("question").innerText = "Не вдалося отримати питання.";
-    }
-});
+                console.log(data); // для перевірки
+
+                document.getElementById("question").innerText = data.text; // <-- правильний ключ
+                currentAnswer = data.answer;
+
+                document.getElementById("answer").innerText = "";
+                document.getElementById("show-answer-btn").style.display = "inline-block";
+            } catch (error) {
+                console.error("Помилка при отриманні питання:", error);
+                document.getElementById("question").innerText = "Не вдалося отримати питання.";
+                document.getElementById("answer").innerText = "";
+            }
+        });
 
         document.getElementById("show-answer-btn").addEventListener("click", function() {
-            document.getElementById("answer").innerText = currentAnswer;
+        document.getElementById("answer").innerText = currentAnswer;
         });
+
     </script>
 
 </body>

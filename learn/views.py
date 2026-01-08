@@ -7,12 +7,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from learn.models import Task
-from learn.serializers import TaskSerializer
+from learn.serializers import TaskDetailSerializer, TaskListSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+    serializer_class = TaskListSerializer
+
+    def get_serializer_class(self):
+        if self.action in ["retrieve", "create", "update", "partial_update"]:
+            return TaskDetailSerializer
+
+        return self.serializer_class
 
 
 class RandomQuestionView(APIView):
@@ -20,16 +26,20 @@ class RandomQuestionView(APIView):
         questions = Task.objects.all()
         if not questions.exists():
             return Response(
-                {"detail": "There are no questions yet. Would you like to add more questions before continuing?"}, status=status.HTTP_404_NOT_FOUND
+                {
+                    "detail": "There are no questions yet. Would you like to add more questions before continuing?"
+                },
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         random_question = random.choice(questions)
-        serializer = TaskSerializer(random_question)
+        serializer = TaskDetailSerializer(random_question, context={"request": request})
         return Response(serializer.data)
 
 
 def random_question_page(request):
     return render(request, "index.html")
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 def upload_questions_view(request):
