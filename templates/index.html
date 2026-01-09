@@ -3,70 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <title>Learn Assistant</title>
+
     <style>
         body {
-            background-color: white;
+            background-color: #f7f9fc;
             font-family: Arial, sans-serif;
             text-align: center;
-            padding-top: 100px;
+            padding-top: 80px;
+            color: #333;
         }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 50px;
+        }
+
         .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px 40px;
+            padding: 18px 36px;
             margin: 20px;
-            font-size: 24px;
+            font-size: 22px;
             border: none;
             border-radius: 12px;
             cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
+
         .btn:hover {
-            background-color: #45a049;
+            transform: translateY(-2px);
         }
-        #question, #answer {
+
+        /* Primary button */
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #43a047;
+        }
+
+        /* Secondary button */
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1e88e5;
+        }
+
+        #question {
+            margin-top: 50px;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        #answer {
+            margin-top: 30px;
+            font-size: 26px;
+            color: #555;
+        }
+
+        .actions {
             margin-top: 40px;
-            font-size: 28px;
         }
+
+        .btn-stop {
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #d6d6d6;
+        }
+
     </style>
 </head>
 <body>
 
     <h1>Learn Assistant</h1>
 
-    <button id="show-question-btn" class="btn">Question</button>
+    <!-- Question -->
+    <button id="show-question-btn" class="btn btn-primary">
+        Show question
+    </button>
+
     <div id="question"></div>
 
-    <button id="show-answer-btn" class="btn" style="display: none;">Answer</button>
+    <!-- Answer -->
+    <div class="actions">
+        <button id="show-answer-btn" class="btn btn-primary" style="display: none;">
+            Show answer
+        </button>
+    </div>
+
     <div id="answer"></div>
 
-    <script>
-        let currentAnswer = '';
-        const taskId = 2; // обраний пакет
+    <!-- Next question -->
+    <div class="actions">
+        <button id="next-question-btn" class="btn btn-secondary" style="display:none;">
+            Next question →
+        </button>
+    </div>
 
-        document.getElementById("show-question-btn").addEventListener("click", async function() {
-            try {
-                const response = await fetch(`/learn/random/${taskId}/`);
-                const data = await response.json();
+    <div class="actions">
+        <button id="stop-btn" class="btn btn-stop">
+            ⏹ Stop & Home
+        </button>
+    </div>
 
-                console.log(data); // для перевірки
+<script>
+    let allQuestions = [];
+    let currentAnswer = '';
+    const taskId = 2;
 
-                document.getElementById("question").innerText = data.text; // <-- правильний ключ
-                currentAnswer = data.answer;
+    function showRandomQuestion() {
+        const randomIndex = Math.floor(Math.random() * allQuestions.length);
+        const question = allQuestions[randomIndex];
 
-                document.getElementById("answer").innerText = "";
-                document.getElementById("show-answer-btn").style.display = "inline-block";
-            } catch (error) {
-                console.error("Помилка при отриманні питання:", error);
-                document.getElementById("question").innerText = "Не вдалося отримати питання.";
-                document.getElementById("answer").innerText = "";
+        document.getElementById("question").innerText = question.text_question;
+        currentAnswer = question.answer;
+        document.getElementById("answer").innerText = "";
+    }
+
+    document.getElementById("show-question-btn").addEventListener("click", async function() {
+        try {
+            const response = await fetch(`/learn/tasks/${taskId}/`);
+            const data = await response.json();
+
+            allQuestions = data.questions;
+
+            if (!allQuestions || allQuestions.length === 0) {
+                document.getElementById("question").innerText = "Питань немає";
+                return;
             }
-        });
 
-        document.getElementById("show-answer-btn").addEventListener("click", function() {
+            showRandomQuestion();
+
+            document.getElementById("show-answer-btn").style.display = "inline-block";
+            document.getElementById("next-question-btn").style.display = "inline-block";
+        } catch (error) {
+            console.error(error);
+            document.getElementById("question").innerText = "Помилка завантаження";
+        }
+    });
+
+    document.getElementById("show-answer-btn").addEventListener("click", function() {
         document.getElementById("answer").innerText = currentAnswer;
-        });
+    });
 
-    </script>
+    document.getElementById("next-question-btn").addEventListener("click", function() {
+        showRandomQuestion();
+    });
+
+    document.getElementById("stop-btn").addEventListener("click", function() {
+        window.location.href = "/learn/";
+    });
+</script>
 
 </body>
 </html>
