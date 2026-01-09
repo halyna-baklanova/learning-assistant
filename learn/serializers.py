@@ -10,6 +10,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class TaskDetailSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="learn:task-detail")
+    questions = QuestionSerializer(many=True)
 
     class Meta:
         model = Task
