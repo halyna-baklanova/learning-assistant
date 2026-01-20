@@ -1,13 +1,24 @@
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+"""
+Views for the learning assistant application.
+Handles task management, question uploads, and random question selection.
+"""
+
 import random
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+
+from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from learn.models import Task
-from learn.serializers import TaskDetailSerializer, TaskListSerializer
+from learn.serializers import (
+    QuestionSerializer,
+    TaskDetailSerializer,
+    TaskListSerializer,
+)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -19,26 +30,6 @@ class TaskViewSet(viewsets.ModelViewSet):
             return TaskDetailSerializer
 
         return self.serializer_class
-
-
-class RandomQuestionView(APIView):
-    def get(self, request):
-        questions = Task.objects.all()
-        if not questions.exists():
-            return Response(
-                {
-                    "detail": "There are no questions yet. Would you like to add more questions before continuing?"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        random_question = random.choice(questions)
-        serializer = TaskDetailSerializer(random_question, context={"request": request})
-        return Response(serializer.data)
-
-
-def random_question_page(request):
-    return render(request, "index.html")
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -64,3 +55,20 @@ def upload_questions_view(request):
         message = f"Successfully uploaded {len(tasks)} questions."
 
     return render(request, "upload.html", {"message": message})
+
+
+@api_view(["GET"])
+def random_question_by_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    questions = task.questions.all()
+
+    if not questions:
+        return Response({
+            "error": "No questions found",
+            "task_id": task_id
+        }, status=status.HTTP_404_NOT_FOUND)
+
+    random_question = random.choice(list(questions))
+    serializer = QuestionSerializer(random_question)
+
+    return Response(serializer.data)
