@@ -22,14 +22,33 @@ from learn.serializers import (
 
 
 class TaskViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing learning tasks.
+
+    Provides standard CRUD operations and dynamically switches serializers
+    based on the action to optimize data transfer.
+
+    Attributes:
+        queryset: Database query that retrieves all Task objects.
+        serializer_class: Default serializer for list views (summary view).
+    """
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
 
     def get_serializer_class(self):
-        if self.action in ["retrieve", "create", "update", "partial_update"]:
-            return TaskDetailSerializer
+        """
+        Return the class to use for the serializer.
 
-        return self.serializer_class
+        Returns TaskDetailSerializer for detailed operations to include
+        nested questions, otherwise returns TaskListSerializer for brief listing.
+
+        Logic:
+            - list -> TaskListSerializer (short summary)
+            - others -> TaskDetailSerializer (full data)
+        """
+        if self.action == "list":
+            return TaskListSerializer
+        return TaskDetailSerializer
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -59,6 +78,19 @@ def upload_questions_view(request):
 
 @api_view(["GET"])
 def random_question_by_task(request, task_id):
+    """
+    Get a single random question from a specific task.
+
+    This endpoint retrieves all questions associated with the given task ID
+    and returns one of them selected at random. Useful for flashcards or quizzes.
+
+    Parameters:
+    task_id (int): The unique ID of the task to pull questions from.
+
+    Returns:
+    200 OK: A serialized Question object.
+    404 Not Found: If the task doesn't exist or has no questions.
+    """
     task = get_object_or_404(Task, id=task_id)
     questions = task.questions.all()
 
