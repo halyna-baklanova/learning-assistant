@@ -8,6 +8,7 @@ import random
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
@@ -15,6 +16,7 @@ from rest_framework.response import Response
 
 from learn.models import Task
 from learn.permissions import IsOwnerOrReadOnly
+
 from learn.serializers import (
     QuestionSerializer,
     TaskDetailSerializer,
@@ -36,7 +38,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer_class: Default serializer for list views (summary view).
     """
     queryset = Task.objects.all()
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = TaskListSerializer
 
     def get_serializer_class(self):
