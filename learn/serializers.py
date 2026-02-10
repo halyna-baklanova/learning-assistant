@@ -11,15 +11,17 @@ class QuestionSerializer(serializers.ModelSerializer):
 class TaskDetailSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="learn:task-detail")
     questions = QuestionSerializer(many=True)
+    owner = serializers.ReadOnlyField(source="owner.username")
 
     class Meta:
         model = Task
-        fields = ["url", "title", "description", "questions"]
+        fields = ["url", "id", "title", "description", "owner", "questions"]
 
 
 class TaskListSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="learn:task-detail")
+    owner = serializers.ReadOnlyField(source="owner.username")
 
     class Meta:
         model = Task
-        fields = ["url", "title"]
+        fields = ["url", "title", "owner"]

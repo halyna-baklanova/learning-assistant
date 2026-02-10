@@ -28,6 +28,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     Provides standard CRUD operations and dynamically switches serializers
     based on the action to optimize data transfer.
 
+    Automatically sets the owner to the current user when creating tasks.
+
     Attributes:
         queryset: Database query that retrieves all Task objects.
         serializer_class: Default serializer for list views (summary view).
@@ -49,6 +51,10 @@ class TaskViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return TaskListSerializer
         return TaskDetailSerializer
+
+    def perform_create(self, serializer):
+        """Set owner to current user when creating a task."""
+        serializer.save(owner=self.request.user)
 
 
 @method_decorator(csrf_exempt, name="dispatch")

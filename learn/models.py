@@ -1,7 +1,13 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
 class Task(models.Model):
+    owner = models.ForeignKey(
+        User,
+        related_name="tasks",
+        on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=255, default="Untitled")
     description = models.TextField(blank=True, null=True)
 
@@ -10,7 +16,11 @@ class Task(models.Model):
 
 
 class Question(models.Model):
-    task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
+    task = models.ForeignKey(
+        Task,
+        related_name="questions",
+        on_delete=models.CASCADE
+    )
     text_question = models.TextField()
     answer = models.TextField()
 
