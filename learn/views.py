@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from learn.models import Task
+from learn.permissions import IsOwnerOrReadOnly
 from learn.serializers import (
     QuestionSerializer,
     TaskDetailSerializer,
@@ -35,6 +36,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer_class: Default serializer for list views (summary view).
     """
     queryset = Task.objects.all()
+    permission_classes = [IsOwnerOrReadOnly]
     serializer_class = TaskListSerializer
 
     def get_serializer_class(self):
