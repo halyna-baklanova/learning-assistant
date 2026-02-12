@@ -5,22 +5,22 @@ Handles task management, question uploads, and random question selection.
 
 import random
 
-from django.shortcuts import get_object_or_404, render
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from learn.models import Task
+from learn.models import Task, Question
 from learn.permissions import IsOwnerOrReadOnly
 
 from learn.serializers import (
     QuestionSerializer,
     TaskDetailSerializer,
     TaskListSerializer,
+    BulkQuestionUploadSerializer,
 )
 
 
@@ -60,30 +60,70 @@ class TaskViewSet(viewsets.ModelViewSet):
         """Set owner to current user when creating a task."""
         serializer.save(owner=self.request.user)
 
+    @action(
+        detail=True,
+        methods=["get", "post"],
+        url_path='upload-questions',
+        serializer_class=BulkQuestionUploadSerializer
+    )
+    def upload_questions(self, request, pk=None):
+        """
+        Bulk upload questions to a specific task.
 
-@method_decorator(csrf_exempt, name="dispatch")
-def upload_questions_view(request):
-    message = None
+        Only the task owner can upload questions.
 
-    if request.method == "POST":
-        raw_text = request.POST.get("data", "")
-        lines = raw_text.splitlines()
-        tasks = []
-        question = None
+        Expected JSON format:
+        {
+            "questions": [
+                {
+                    "text_question": "Question text",
+                    "answer": "Answer text"
+                },
+                ...
+            ]
+        }
+        """
+        task = self.get_object()
 
-        for line in lines:
-            line = line.strip()
-            if line.startswith("Q:"):
-                question = line[2:].strip()
-            elif line.startswith("A:") and question:
-                answer = line[2:].strip()
-                tasks.append(Task(question=question, answer=answer))
-                question = None  # скидаємо після збереження
+        if request.method == "GET":
+            existing_questions = task.questions.all()
+            return Response({
+                "message": f"Upload questions to task: {task.title}",
+                "task_id": task.id,
+                "task_title": task.title,
+                "task_description": task.description,
+                "existing_questions_count": existing_questions.count(),
+                "existing_questions": QuestionSerializer(existing_questions, many=True).data,
+                "instructions": "Send POST request with questions array in JSON format",
+            })
 
-        Task.objects.bulk_create(tasks)
-        message = f"Successfully uploaded {len(tasks)} questions."
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    return render(request, "upload.html", {"message": message})
+        questions_data = serializer.validated_data["questions"]
+        questions_to_create = []
+
+        for question_data in questions_data:
+            questions_to_create.append(
+                Question(
+                    task=task,
+                    text_question=question_data["text_question"],
+                    answer=question_data["answer"]
+                )
+            )
+
+        created_questions = Question.objects.bulk_create(questions_to_create)
+
+        return Response(
+            {
+                "message": f"Successfully uploaded {len(created_questions)} questions to task '{task.title}'",
+                "task_id": task.id,
+                "task_title": task.title,
+                "created_count": len(created_questions),
+                "questions": QuestionSerializer(created_questions, many=True).data
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 @api_view(["GET"])

@@ -14,7 +14,6 @@ from rest_framework.routers import DefaultRouter
 from learn.views import (
     TaskViewSet,
     random_question_by_task,
-    upload_questions_view,
 )
 
 app_name = "learn"
@@ -28,12 +27,6 @@ urlpatterns = [
     # ViewSet routes (automatically generates list, detail, create, update, delete)
     path("", include(router.urls)),
 
-    # Custom endpoints
-    path(
-        "upload/",
-        upload_questions_view,
-        name="upload-questions"
-    ),
     path(
         "random/question/<int:task_id>/",
         random_question_by_task,
