@@ -13,7 +13,6 @@ from rest_framework.routers import DefaultRouter
 
 from learn.views import (
     TaskViewSet,
-    random_question_by_task,
 )
 
 app_name = "learn"
@@ -25,11 +24,5 @@ router.register(r"tasks", TaskViewSet, basename="task")
 # URL patterns
 urlpatterns = [
     # ViewSet routes (automatically generates list, detail, create, update, delete)
-    path("", include(router.urls)),
-
-    path(
-        "random/question/<int:task_id>/",
-        random_question_by_task,
-        name="random-question-by-task"
-    ),
+    path("", include(router.urls))
 ]

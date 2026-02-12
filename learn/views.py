@@ -125,32 +125,52 @@ class TaskViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
+    @action(detail=True, methods=["get"], url_path="study")
+    def study(self, request, pk=None):
+        """
+        Get a random question from this task for studying.
 
-@api_view(["GET"])
-def random_question_by_task(request, task_id):
-    """
-    Get a single random question from a specific task.
+        Returns a random question from the task's question pool.
+        The same question may appear multiple times (fully random).
 
-    This endpoint retrieves all questions associated with the given task ID
-    and returns one of them selected at random. Useful for flashcards or quizzes.
+        GET /learn/tasks/{id}/study/
 
-    Parameters:
-    task_id (int): The unique ID of the task to pull questions from.
+        Returns:
+            200: Random question with answer
+            404: Task has no questions
 
-    Returns:
-    200 OK: A serialized Question object.
-    404 Not Found: If the task doesn't exist or has no questions.
-    """
-    task = get_object_or_404(Task, id=task_id)
-    questions = task.questions.all()
+        Response format:
+        {
+            "question_id": 42,
+            "task_id": 5,
+            "task_title": "Python Basics",
+            "text_question": "What is a list?",
+            "answer": "A collection of items",
+            "total_questions": 10
+        }
+        """
+        task = self.get_object()
+        questions = task.questions.all()
 
-    if not questions:
+        if not questions.exists():
+            return Response(
+                {
+                    "error": "No questions available for this task",
+                    "task_id": task.id,
+                    "task_title": task.title,
+                    "message": "Please add questions to this task first"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        random_question = questions.order_by("?").first()
+
         return Response({
-            "error": "No questions found",
-            "task_id": task_id
-        }, status=status.HTTP_404_NOT_FOUND)
-
-    random_question = random.choice(list(questions))
-    serializer = QuestionSerializer(random_question)
-
-    return Response(serializer.data)
+            "question_id": random_question.id,
+            "task_id": task.id,
+            "task_title": task.title,
+            "text_question": random_question.text_question,
+            "answer": random_question.answer,
+            "total_questions": questions.count(),
+            "has_ai_answer": False #for AI-Feature
+        })
