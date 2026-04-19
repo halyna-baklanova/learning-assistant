@@ -1,6 +1,6 @@
 # Learn Assistant
 
-**Learn Assistant** is a website designed to help users study new topics effectively through random question testing. Users can upload a list of questions and quiz themselves in a random order, which is more engaging than reading questions sequentially. Future plans include integrating AI to automatically check answers.
+**Learn Assistant** is a website designed to help users study new topics effectively through random question testing. Users can upload a list of questions and quiz themselves in a random order, which is more engaging than reading questions sequentially. Future plans include connecting PostgreSQL database and integrating AI to automatically check answers.
 
 ---
 
