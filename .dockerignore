@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+env
+
+# Local settings and secrets
+.env
+db.sqlite3
+
+# Docker
+Dockerfile
+docker-compose.yaml
+.dockerignore
